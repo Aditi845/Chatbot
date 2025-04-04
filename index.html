@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LocaBuddy - Local Attraction Recommender</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #8e44ad, #3498db);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 30px;
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 30px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      background-color: #ffffff;
+      color: #333;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #f1c40f;
+    }
+
+    #output {
+      margin-top: 30px;
+      background-color: rgba(0,0,0,0.3);
+      padding: 20px;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌍 LocaBuddy</h1>
+    <p style="text-align:center;">Find the perfect local attractions based on your interests!</p>
+
+    <label for="location">Enter Your City</label>
+    <input type="text" id="location" placeholder="e.g. Delhi" />
+
+    <label for="interest">What Are You Interested In?</label>
+    <input type="text" id="interest" placeholder="e.g. history, food, art..." />
+
+    <button onclick="getAttractions()">🎯 Get Recommendations</button>
+
+    <div id="output"></div>
+  </div>
+
+  <script>
+    async function getAttractions() {
+      const location = document.getElementById("location").value.trim();
+      const interest = document.getElementById("interest").value.trim();
+
+      if (!location || !interest) {
+        document.getElementById("output").innerText = "Please enter both city and interest.";
+        return;
+      }
+
+      const prompt = `Suggest 5 local attractions in ${location} for someone interested in ${interest}. Include short descriptions and why each is a good fit.`;
+
+      document.getElementById("output").innerText = "Thinking... ✨";
+
+      try {
+        const response = await fetch("http://localhost:3000/api/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ prompt })
+        });
+
+        const data = await response.json();
+        document.getElementById("output").innerText = data.generatedText || "No suggestions found.";
+      } catch (error) {
+        document.getElementById("output").innerText = "Error fetching recommendations.";
+        console.error(error);
+      }
+    }
+  </script>
+</body>
+</html>
